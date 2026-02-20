@@ -3,6 +3,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Component styles */
+@import './hero.css';
+
 /* Base styles and custom properties */
 @layer base {
   :root {
