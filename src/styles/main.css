@@ -6,6 +6,7 @@
 /* Component styles */
 @import './hero.css';
 @import './programs.css';
+@import './impact.css';
 
 /* Base styles and custom properties */
 @layer base {
