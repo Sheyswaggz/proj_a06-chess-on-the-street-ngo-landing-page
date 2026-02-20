@@ -9,6 +9,7 @@
 @import './impact.css';
 @import './about.css';
 @import './contact.css';
+@import './navigation.css';
 
 /* Base styles and custom properties */
 @layer base {
