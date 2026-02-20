@@ -6,17 +6,26 @@
 import { initializeNavigation } from './navigation.js';
 import { initializeCounters } from './impact-animations.js';
 import { initializeContactForm } from './contact-form.js';
+import {
+  trackDonation,
+  trackVolunteerSignup,
+  trackFormSubmission,
+  trackNavigationClick,
+  isGtagAvailable,
+} from './analytics.js';
 
 /**
  * Application state management
  */
 const appState = {
   isInitialized: false,
+  analyticsReady: false,
   modules: {
     navigation: false,
     counters: false,
     contactForm: false,
     donation: false,
+    analytics: false,
   },
 };
 
@@ -109,6 +118,15 @@ function initializeDonationSelector() {
       // Update donate button
       updateDonateButton(selectedAmount);
 
+      // Track analytics event
+      if (appState.analyticsReady) {
+        trackDonation({
+          amount: selectedAmount,
+          type: 'preset',
+          status: 'amount_selected',
+        });
+      }
+
       console.log('Preset amount selected', { amount: selectedAmount });
     };
 
@@ -159,6 +177,15 @@ function initializeDonationSelector() {
         input.classList.remove('error');
         input.setAttribute('aria-invalid', 'false');
 
+        // Track analytics event
+        if (appState.analyticsReady) {
+          trackDonation({
+            amount: selectedAmount,
+            type: 'custom',
+            status: 'amount_entered',
+          });
+        }
+
         console.log('Custom amount entered', { amount: selectedAmount });
       } else if (input.value.trim() !== '') {
         // Show error for invalid input
@@ -191,6 +218,16 @@ function initializeDonationSelector() {
         amount: selectedAmount,
         timestamp: new Date().toISOString(),
       });
+
+      // Track analytics event for donation initiation
+      if (appState.analyticsReady) {
+        trackDonation({
+          amount: selectedAmount,
+          type: customAmountInput && customAmountInput.value ? 'custom' : 'preset',
+          status: 'initiated',
+          method: 'stripe',
+        });
+      }
 
       // TODO: Integrate with Stripe Checkout
       // This will be implemented when Stripe integration is added
@@ -245,6 +282,94 @@ function initializeDonationSelector() {
       stack: error.stack,
     });
     appState.modules.donation = false;
+  }
+}
+
+/**
+ * Initialize analytics integration
+ * Sets up event listeners for analytics tracking
+ * @returns {void}
+ */
+function initializeAnalyticsIntegration() {
+  try {
+    // Check if analytics is available
+    if (!isGtagAvailable()) {
+      console.warn('Google Analytics not available - analytics tracking disabled');
+      appState.modules.analytics = false;
+      appState.analyticsReady = false;
+      return;
+    }
+
+    // Track volunteer CTA clicks
+    const volunteerButtons = document.querySelectorAll('a[href="#volunteer"], .cta-secondary');
+    volunteerButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        trackVolunteerSignup({
+          source: button.closest('.hero-section') ? 'hero_cta' : 'other',
+        });
+      });
+    });
+
+    // Track navigation clicks
+    const navLinks = document.querySelectorAll('.nav-menu a, .footer-section a');
+    navLinks.forEach((link) => {
+      link.addEventListener('click', () => {
+        const destination = link.getAttribute('href') || '';
+        const source = link.closest('.nav-menu') ? 'header' :
+          link.closest('.footer-section') ? 'footer' : 'inline';
+        const linkText = link.textContent.trim();
+
+        trackNavigationClick({
+          destination,
+          source,
+          linkText,
+        });
+      });
+    });
+
+    // Track contact form submission
+    const contactForm = document.querySelector('[data-contact-form]');
+    if (contactForm) {
+      contactForm.addEventListener('submit', (event) => {
+        trackFormSubmission({
+          formName: 'contact_form',
+          formType: 'contact',
+          status: 'submitted',
+        });
+      });
+    }
+
+    // Listen for form submission success/error from contact-form module
+    window.addEventListener('formSubmitSuccess', (event) => {
+      if (event.detail && event.detail.formName) {
+        trackFormSubmission({
+          formName: event.detail.formName,
+          formType: 'contact',
+          status: 'success',
+        });
+      }
+    });
+
+    window.addEventListener('formSubmitError', (event) => {
+      if (event.detail && event.detail.formName) {
+        trackFormSubmission({
+          formName: event.detail.formName,
+          formType: 'contact',
+          status: 'error',
+        });
+      }
+    });
+
+    appState.modules.analytics = true;
+    appState.analyticsReady = true;
+    console.log('Analytics integration initialized successfully');
+  } catch (error) {
+    console.error('Error initializing analytics integration', {
+      name: error.name,
+      message: error.message,
+    });
+    appState.modules.analytics = false;
+    appState.analyticsReady = false;
   }
 }
 
@@ -350,6 +475,9 @@ function initializeApp() {
 
     // Apply mobile optimizations
     initializeMobileOptimizations();
+
+    // Initialize analytics integration first
+    initializeAnalyticsIntegration();
 
     // Initialize navigation module
     try {
