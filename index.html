@@ -136,6 +136,73 @@
           <a href="#donate" class="cta-button cta-primary" aria-label="Donate now to support our mission">Donate Now</a>
           <a href="#volunteer" class="cta-button cta-secondary" aria-label="Sign up to volunteer with us">Volunteer</a>
         </div>
+
+        <!-- Donation Amount Selector -->
+        <div class="donation-selector" data-donation-selector role="group" aria-labelledby="donation-heading">
+          <h3 id="donation-heading" class="donation-heading">Support Our Mission</h3>
+          <p class="donation-description">Choose an amount to donate and help us bring chess to more communities.</p>
+
+          <!-- Preset Amount Buttons -->
+          <div class="donation-amounts" role="radiogroup" aria-label="Preset donation amounts">
+            <button type="button" class="donation-amount-button" data-amount="10" role="radio" aria-checked="false">
+              $10
+            </button>
+            <button type="button" class="donation-amount-button" data-amount="25" role="radio" aria-checked="false">
+              $25
+            </button>
+            <button type="button" class="donation-amount-button" data-amount="50" role="radio" aria-checked="false">
+              $50
+            </button>
+            <button type="button" class="donation-amount-button" data-amount="100" role="radio" aria-checked="false">
+              $100
+            </button>
+            <button type="button" class="donation-amount-button" data-amount="250" role="radio" aria-checked="false">
+              $250
+            </button>
+            <button type="button" class="donation-amount-button" data-amount="500" role="radio" aria-checked="false">
+              $500
+            </button>
+          </div>
+
+          <!-- Custom Amount Input -->
+          <div class="donation-custom" role="group" aria-labelledby="custom-amount-label">
+            <label for="custom-amount" id="custom-amount-label" class="custom-amount-label">
+              Or enter a custom amount:
+            </label>
+            <div class="custom-amount-wrapper">
+              <span class="currency-symbol" aria-hidden="true">$</span>
+              <input
+                type="text"
+                id="custom-amount"
+                name="custom-amount"
+                class="custom-amount-input"
+                data-custom-amount
+                placeholder="0.00"
+                inputmode="decimal"
+                aria-label="Enter custom donation amount in dollars"
+                aria-invalid="false"
+                aria-describedby="custom-amount-error"
+              >
+              <span id="custom-amount-error" class="error-message" role="alert" aria-live="polite"></span>
+            </div>
+          </div>
+
+          <!-- Donate Button -->
+          <button
+            type="button"
+            class="donate-button"
+            data-donate-button
+            disabled
+            aria-disabled="true"
+            aria-label="Proceed to donation"
+          >
+            <span class="button-text">Select Amount</span>
+          </button>
+
+          <p class="donation-note">
+            <small>Donations are secure and processed through Stripe. You will be redirected to complete your donation.</small>
+          </p>
+        </div>
       </div>
     </section>
 
