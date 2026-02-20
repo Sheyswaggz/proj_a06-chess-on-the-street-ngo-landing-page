@@ -8,6 +8,7 @@
 @import './programs.css';
 @import './impact.css';
 @import './about.css';
+@import './contact.css';
 
 /* Base styles and custom properties */
 @layer base {
