@@ -49,3 +49,6 @@ coverage/
 # package-lock.json
 # yarn.lock
 # pnpm-lock.yaml
+
+# Claude CLI task files
+arvad_task_files/
